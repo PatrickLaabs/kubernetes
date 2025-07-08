@@ -1081,6 +1081,7 @@ func pvcWithDataSource(dataSource *core.TypedLocalObjectReference) *core.Persist
 		},
 	}
 }
+
 func pvcWithDataSourceRef(ref *core.TypedObjectReference) *core.PersistentVolumeClaim {
 	return &core.PersistentVolumeClaim{
 		Spec: core.PersistentVolumeClaimSpec{
@@ -17964,7 +17965,7 @@ func TestValidateReplicationControllerUpdate(t *testing.T) {
 				rc.Spec.Selector = invalid
 			}),
 			expectedErrs: field.ErrorList{
-				field.Invalid(field.NewPath("spec.template.labels"), nil, "").WithOrigin("labelKey"),
+				field.Invalid(field.NewPath("spec.template.labels"), nil, "").WithOrigin("format=k8s-label-key"),
 			},
 		},
 		"invalid pod": {
@@ -18113,7 +18114,7 @@ func TestValidateReplicationController(t *testing.T) {
 				}
 			}),
 			expectedErrs: field.ErrorList{
-				field.Invalid(field.NewPath("metadata.labels"), nil, "").WithOrigin("labelKey"),
+				field.Invalid(field.NewPath("metadata.labels"), nil, "").WithOrigin("format=k8s-label-key"),
 			},
 		},
 		"invalid label 2": {
@@ -18124,7 +18125,7 @@ func TestValidateReplicationController(t *testing.T) {
 			}),
 			expectedErrs: field.ErrorList{
 				field.Invalid(field.NewPath("spec.template.metadata.labels"), nil, "does not match template"),
-				field.Invalid(field.NewPath("spec.template.labels"), nil, "").WithOrigin("labelKey"),
+				field.Invalid(field.NewPath("spec.template.labels"), nil, "").WithOrigin("format=k8s-label-key"),
 			},
 		},
 		"invalid annotation": {
@@ -18134,7 +18135,7 @@ func TestValidateReplicationController(t *testing.T) {
 				}
 			}),
 			expectedErrs: field.ErrorList{
-				field.Invalid(field.NewPath("metadata.annotations"), nil, "name part must consist of"),
+				field.Invalid(field.NewPath("metadata.annotations"), nil, "").WithOrigin("format=k8s-label-key"),
 			},
 		},
 		"invalid restart policy 1": {
@@ -24469,7 +24470,7 @@ func TestValidateTopologySpreadConstraints(t *testing.T) {
 			MatchLabelKeys:    []string{"/simple"},
 		}},
 		wantFieldErrors: field.ErrorList{
-			field.Invalid(fieldPathMatchLabelKeys.Index(0), nil, "").WithOrigin("labelKey"),
+			field.Invalid(fieldPathMatchLabelKeys.Index(0), nil, "").WithOrigin("format=k8s-label-key"),
 		},
 		opts: PodValidationOptions{
 			AllowMatchLabelKeysInPodTopologySpread:              true,
@@ -24485,7 +24486,7 @@ func TestValidateTopologySpreadConstraints(t *testing.T) {
 			MatchLabelKeys:    []string{"/simple"},
 		}},
 		wantFieldErrors: field.ErrorList{
-			field.Invalid(fieldPathMatchLabelKeys.Index(0), nil, "").WithOrigin("labelKey"),
+			field.Invalid(fieldPathMatchLabelKeys.Index(0), nil, "").WithOrigin("format=k8s-label-key"),
 		},
 		opts: PodValidationOptions{
 			AllowMatchLabelKeysInPodTopologySpread:              true,
@@ -24584,7 +24585,7 @@ func TestValidateTopologySpreadConstraints(t *testing.T) {
 			LabelSelector:     &metav1.LabelSelector{MatchLabels: map[string]string{"NoUppercaseOrSpecialCharsLike=Equals": "foo"}},
 		}},
 		wantFieldErrors: field.ErrorList{
-			field.Invalid(labelSelectorField.Child("matchLabels"), nil, "").WithOrigin("labelKey"),
+			field.Invalid(labelSelectorField.Child("matchLabels"), nil, "").WithOrigin("format=k8s-label-key"),
 		},
 		opts: PodValidationOptions{
 			AllowMatchLabelKeysInPodTopologySpread:              true,
